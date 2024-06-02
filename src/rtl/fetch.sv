@@ -15,23 +15,19 @@ module fetch (
   output logic [31:0] inst_out
 );
 
-logic [31:0] inst_addr;
-assign inst_addr = pc_in >> 2; //shift pc to address instruction cache 
+assign read_addr = pc_in >> 2; //shift pc to address instruction cache
+assign read_enb = ~stall;
 
 always_ff @(posedge clk) begin
   if(!rstn) begin
-    read_enb <= 1'b0;
-    read_addr <= 32'd0;
     inst_out <= 32'b0;
     fetch_ready <= 1'b1;
     pc_out <= 32'd0;
   end else begin
     if(!stall) begin
       if(decode_ready) begin
-        read_enb <= 1'b1;
-        read_addr <= inst_addr;
         inst_out <= inst_in;
-        pc_out <= pc_in + 4;
+        pc_out <= pc_in;
       end else begin
         fetch_ready <= 1'b0;
       end
